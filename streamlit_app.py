@@ -336,16 +336,14 @@ with metrics_row[1]:
 
 st.write('## Previous Results')
 
-prediction_row = [*test.values.tolist()[0], cur_pred, diff_pred, cur_runtime, diff_runtime]
+prediction_row = [data_scaling, model_name, *test.values.tolist()[0], cur_pred, cur_runtime]
 st.session_state['predictions'].append(prediction_row)
 st.dataframe(pd.DataFrame(
         st.session_state['predictions'],
-        columns=[*[col.replace('_', ' ').title() for col in df.columns], 'Price Diff (%)', 'Runtime (s)', 'Runtime Diff (%)']
+        columns=['Scaling', 'Model', *[col.replace('_', ' ').title() for col in df.columns], 'Runtime (s)']
     ).style.format({
         'Resale Price': '{:,.2f}',
-        'Price Diff (%)': '{:,.2%}',
         'Runtime (s)': '{:.2f}',
-        'Runtime Diff (%)': '{:.2%}',
     })
 )
 
