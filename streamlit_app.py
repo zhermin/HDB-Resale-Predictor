@@ -43,7 +43,8 @@ def load_data(data_file: str) -> tuple[pd.DataFrame]:
 
     return df_trim, X, y
 
-df, X, y = load_data('hdb_2017-2022.csv')
+filename = 'hdb_2017-2022.csv'
+df, X, y = load_data(filename)
 
 #------------------- Initial and Randomized State Variables -------------------#
 
@@ -309,7 +310,7 @@ This is a prediction tool built using Streamlit as an extension to the analysis 
 done to forecast Singapore's HDB resale prices using classic regression techniques \
 such as linear regression, tree-based regression, support vector regression and \
 artificial neural networks. The models are trained on historical prices from \
-2017 to 2022 retrieved from [Data.gov.sg](https://data.gov.sg/dataset/resale-flat-prices "Historical Resale Flat Prices").
+2017 to 2022, retrieved from [Data.gov.sg](https://data.gov.sg/dataset/resale-flat-prices "Historical Resale Flat Prices").
 
 Feel free to use the *Randomize!* button at the sidebar to select the parameters for your HDB! 
 '''
@@ -338,19 +339,31 @@ st.write('## Previous Results')
 
 prediction_row = [data_scaling, model_name, *test.values.tolist()[0], cur_pred, cur_runtime]
 st.session_state['predictions'].append(prediction_row)
-st.dataframe(pd.DataFrame(
-        st.session_state['predictions'],
-        columns=['Scaling', 'Model', *[col.replace('_', ' ').title() for col in df.columns], 'Runtime (s)']
-    ).style.format({
-        'Resale Price': '{:,.2f}',
-        'Runtime (s)': '{:.2f}',
-    })
+df_pred = pd.DataFrame(
+    st.session_state['predictions'],
+    columns=['Scaling', 'Model', *[col.replace('_', ' ').title() for col in df.columns], 'Runtime (s)']
+)
+st.dataframe(df_pred.style.format({
+    'Resale Price': '{:,.2f}',
+    'Runtime (s)': '{:.2f}',
+}))
+st.download_button(
+    label='DOWNLOAD',
+    data=df_pred.to_csv(index=False, encoding='utf-8'),
+    file_name='predictions.csv',
+    mime='text/csv',
 )
 
 st.write('---')
 
 with st.expander(f'View Raw Data'):
     st.write(df)
+    st.download_button(
+        label='DOWNLOAD',
+        data=df.to_csv(index=False, encoding='utf-8'),
+        file_name=filename,
+        mime='text/csv',
+    )
 
 #---------------------- Update Previous State Variables -----------------------#
 
